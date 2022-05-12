@@ -31,11 +31,10 @@
 
 <script >
 import { ref } from "@vue/reactivity";
-import { watch } from "@vue/runtime-core";
+import { onMounted, watch } from "@vue/runtime-core";
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import webSocket from "../../utils/client";
-import LocalCatch from "../../utils/catch";
 export default {
   props: {
     roomId: {
@@ -60,12 +59,16 @@ export default {
       ws.send("pub", null, null, props.roomId.value.id, textarea.value);
       textarea.value = "";
     };
+    onMounted(()=>{
+      ws = new webSocket("wss://lab.lapsap.moe/ws");
+    })
     watch(props.roomId, () => {
+
       if (currentRoomId.value != "") {
         ws.send("unsub", null, null, currentRoomId.value, "退出连接");
       }
       currentRoomId.value = props.roomId.value.id;
-      ws = new webSocket("wss://lab.lapsap.moe/ws");
+      ws.send("sub", null, null, props.roomId.value.id, "进入房间");
     });
     return { textarea, deleteRoom, sendMessage };
   },
