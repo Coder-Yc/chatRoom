@@ -34,7 +34,7 @@ import { ref } from "@vue/reactivity";
 import { watch } from "@vue/runtime-core";
 import axios from "axios";
 import { ElMessage } from "element-plus";
-import PubSubClient from "../../utils/client";
+import webSocket from "../../utils/client";
 import LocalCatch from "../../utils/catch";
 export default {
   props: {
@@ -46,9 +46,8 @@ export default {
   emits: ["changeDeleteRoomList"],
   setup(props, { emit }) {
     const textarea = ref("");
-    let pubSub = null
-    let userName = LocalCatch.getCatch("userName");
-    // console.log(props);
+    let ws = null;
+    let currentRoomId = ref("");
     const deleteRoom = (id) => {
       axios.delete(`/api/room/${id}`).then((res) => {
         console.log(res.data);
@@ -58,23 +57,15 @@ export default {
       });
     };
     const sendMessage = () => {
-      console.log(props.roomId.value.id);
-      pubSub.publish("message/" + props.roomId.value.id, {
-        userName: userName,
-        body: textarea.value,
-      });
+      ws.send("pub", null, null, props.roomId.value.id, textarea.value);
       textarea.value = "";
     };
     watch(props.roomId, () => {
-      // console.log(props.roomId.value);
-      pubSub = new PubSubClient("ws://localhost:9000/ws", {
-        connect: true,
-        reconnect: true,
-      });
-      pubSub.subscribe("message/", message => {
-        console.log(message.userName, message.body);
-      });
-      console.log(pubSub); 
+      if (currentRoomId.value != "") {
+        ws.send("unsub", null, null, currentRoomId.value, "退出连接");
+      }
+      currentRoomId.value = props.roomId.value.id;
+      ws = new webSocket("wss://lab.lapsap.moe/ws");
     });
     return { textarea, deleteRoom, sendMessage };
   },
