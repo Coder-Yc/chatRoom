@@ -11,7 +11,8 @@ import {
   ElFooter,
   ElSkeleton,
   ElDialog,
-  ElLoading
+  ElLoading,
+  ElAvatar
 
 } from 'element-plus'
 const components = [
@@ -27,6 +28,7 @@ const components = [
     ElSkeleton,
     ElDialog,
     ElLoading,
+    ElAvatar
     
 ]
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'

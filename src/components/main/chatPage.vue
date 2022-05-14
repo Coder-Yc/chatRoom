@@ -11,11 +11,30 @@
           >删除房间</el-button
         >
       </div>
-      <div class="chat-body">
-        <!-- <div class="chat-item" v-for="item in chatList" :key="item">
-                <span>{{item.name}}</span>
-            </div>  -->
-      </div>
+      <!-- <div>{{chatList}}</div> -->
+      <el-scrollbar class="chat-body">
+        <div class="chat-item" v-for="item in chatList" :key="item">
+          <div>{{ item?.msg || "???" }}</div>
+          <!-- <template class="chatMessage" v-if="item.user !== '' ">
+            <div class="user_info" v-bind:style="{flexDirection: (userName === item.name) ? 'row-reverse' : 'row' }">
+              <span class="user_name">{{ item.name }}</span>
+              <el-avatar
+                size="small"
+                src="https://avatars.githubusercontent.com/u/72589527?s=96&v=4"
+              />
+            </div >
+            <div
+              class="user_message"
+              v-bind:style="{ width: item.length * 10 + 'px', flexDirection: (userName === item.name) ? 'row-reverse' : 'row' }"
+            >
+              <span>{{ item.msg }}</span>
+            </div>
+          </template> -->
+          <!-- <template>
+            <div class="welcome_message"></div>
+          </template> -->
+        </div>
+      </el-scrollbar>
     </div>
     <div class="sendMessage">
       <el-input
@@ -30,11 +49,13 @@
 </template>
 
 <script >
-import { ref } from "@vue/reactivity";
-import { onMounted, watch } from "@vue/runtime-core";
+import { reactive, ref } from "@vue/reactivity";
+import { onBeforeMount, watch, onMounted } from "@vue/runtime-core";
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import webSocket from "../../utils/client";
+import LocalCatch from "../../utils/catch";
+import infoFunction from "../../utils/queryMessage";
 export default {
   props: {
     roomId: {
@@ -43,10 +64,19 @@ export default {
     },
   },
   emits: ["changeDeleteRoomList"],
-  setup(props, { emit }) {
-    const textarea = ref("");
+  async setup(props, { emit }) {
     let ws = null;
-    let currentRoomId = ref("");
+    const textarea = ref("");
+    const userName = LocalCatch.getCatch("userName");
+    const currentRoomId = ref("");
+    let chatList = reactive(['11111']);
+    ws = new webSocket("wss://lab.lapsap.moe/ws");
+    onBeforeMount(async () => {
+      console.log(chatList.value);
+      console.log("发生了挂在");
+    });
+    const a  = await infoFunction.queryMessage()
+    chatList.value = a
     const deleteRoom = (id) => {
       axios.delete(`/api/room/${id}`).then((res) => {
         console.log(res.data);
@@ -59,18 +89,14 @@ export default {
       ws.send("pub", null, null, props.roomId.value.id, textarea.value);
       textarea.value = "";
     };
-    onMounted(()=>{
-      ws = new webSocket("wss://lab.lapsap.moe/ws");
-    })
     watch(props.roomId, () => {
-
       if (currentRoomId.value != "") {
         ws.send("unsub", null, null, currentRoomId.value, "退出连接");
       }
       currentRoomId.value = props.roomId.value.id;
       ws.send("sub", null, null, props.roomId.value.id, "进入房间");
     });
-    return { textarea, deleteRoom, sendMessage };
+    return { textarea, deleteRoom, sendMessage, chatList, userName };
   },
 };
 </script>
@@ -94,6 +120,40 @@ export default {
 }
 .chat-body {
   background-color: white;
+  height: 100%;
+}
+.chat-item {
+  display: flex;
+  align-items: flex-end;
+  height: 50px;
+  margin: 5px;
+  border-radius: 4px;
+}
+.el-avatar {
+  margin-right: 2px;
+}
+.user_info {
+  width: 5%;
+  display: flex;
+  flex-direction: column;
+}
+.user_name {
+  font-size: 3px;
+  color: #ccc;
+  font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB",
+    "Microsoft Yahei", tahoma, "WenQuanYi Micro Hei";
+}
+.user_message {
+  margin: 3px 5px;
+  height: 50%;
+  background-color: greenyellow;
+  border-radius: 4px;
+  font-size: 15px;
+  font-family: "Times New Roman", Times, serif;
+  color: rgba(47, 42, 42, 0.807);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .sendMessage {
   width: 100%;
@@ -101,5 +161,14 @@ export default {
   margin-top: 2px;
   height: 200px;
   background: hsla(0, 0%, 100%, 0.3);
+}
+.welcome_message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB",
+    "Microsoft Yahei", tahoma, "WenQuanYi Micro Hei";
+  font-size: 5px;
 }
 </style>

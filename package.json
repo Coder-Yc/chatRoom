@@ -3,12 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode development",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "fbemitter": "^3.0.0",
+    "pouchdb-adapter-idb": "^7.3.0",
+    "rxdb": "^12.4.1",
+    "rxjs": "^7.5.5",
     "vue-beautiful-chat": "^2.5.0",
     "vue-router": "^4.0.15",
     "websocket": "^1.0.34",
