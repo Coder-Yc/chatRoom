@@ -49,7 +49,7 @@ export default {
 
 
     axios.get("/api/room").then((res) => {
-      console.log(res.data);
+      // console.log(res.data);
       roomList.value = res.data;
       isHidden.value = false;
     });

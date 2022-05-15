@@ -1,5 +1,6 @@
 import LocalCatch from "../utils/catch";
 import DatabaseService from "../dbservices/index.js";
+
 export default class webSocket {
   constructor(url) {
     this._url = url
@@ -7,7 +8,7 @@ export default class webSocket {
     this._connected = false
     this.message = []
     this.connect()
-    this.id = 0
+    this.id = LocalCatch.getCatch('id') || 0
   }
   send(type, name, time, room, msg) {
     const obj = {
@@ -30,13 +31,11 @@ export default class webSocket {
     try {
       let data = JSON.parse(JSON.parse(message.data.replace(/\"(.*?)\*/g,'')))
       if (data.err) return
-      // console.log(data);
-      // let chat = LocalCatch.getCatch("chat") || []
-      // chat.push(data)
-      // LocalCatch.setCatch("chat", chat)
       //加入数据库
+      console.log(data);
       data.id = (this.id+1).toString()
       this.id++
+      LocalCatch.setCatch('id', parseInt(data.id))
       await this.insertMessage(data)
     } catch (e) {
     }

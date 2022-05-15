@@ -13,44 +13,64 @@
       </div>
       <!-- <div>{{chatList}}</div> -->
       <el-scrollbar class="chat-body">
-        <div class="chat-item" v-for="item in chatList" :key="item">
-          <div>{{ item?.msg || "???" }}</div>
-          <!-- <template class="chatMessage" v-if="item.user !== '' ">
-            <div class="user_info" v-bind:style="{flexDirection: (userName === item.name) ? 'row-reverse' : 'row' }">
+        <div
+          class="chat-item"
+          v-for="item in chatList"
+          :key="item"
+          v-bind:style="{
+            flexDirection: userName == item.name ? 'row-reverse' : 'row',
+            alignItems: item.user === 'server' ? 'center' : 'flex-end',
+            height: item.user === 'server' ? '25px' : '50px',
+            justifyContent: item.user === 'server' ? 'center' : '',
+          }"
+        >
+          <template class="chatMessage" v-if="item.user === ''">
+            <div class="user_info">
               <span class="user_name">{{ item.name }}</span>
               <el-avatar
                 size="small"
                 src="https://avatars.githubusercontent.com/u/72589527?s=96&v=4"
               />
-            </div >
+            </div>
             <div
               class="user_message"
-              v-bind:style="{ width: item.length * 10 + 'px', flexDirection: (userName === item.name) ? 'row-reverse' : 'row' }"
+              v-bind:style="{ width: item.msg.length * 10 + 'px' }"
             >
               <span>{{ item.msg }}</span>
             </div>
-          </template> -->
-          <!-- <template>
-            <div class="welcome_message"></div>
-          </template> -->
+          </template>
+          <template v-else>
+            <div class="welcome_message">{{ item.msg }}</div>
+          </template>
         </div>
       </el-scrollbar>
     </div>
     <div class="sendMessage">
+      <div class="util-box">
+        <el-upload
+          class="upload-file"
+          action="https://lab.lapsap.moe"
+          :on-preview="handlePreview"
+          :on-remove="handleRemove"
+          :before-remove="beforeRemove"
+        >
+          <i class="el-icon-upload"></i>
+        </el-upload>
+      </div>
       <el-input
-        v-model="textarea"
-        :rows="9"
-        type="textarea"
-        placeholder="Please input"
-        @keyup.enter="sendMessage"
-      />
+          v-model="textarea"
+          :rows="9"
+          type="textarea"
+          placeholder="Please input"
+          @keyup.enter="sendMessage"
+        />
     </div>
   </div>
 </template>
 
 <script >
 import { reactive, ref } from "@vue/reactivity";
-import { onBeforeMount, watch, onMounted } from "@vue/runtime-core";
+import { watch } from "@vue/runtime-core";
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import webSocket from "../../utils/client";
@@ -65,36 +85,42 @@ export default {
   },
   emits: ["changeDeleteRoomList"],
   async setup(props, { emit }) {
+    //初始化操作
     let ws = null;
     const textarea = ref("");
     const userName = LocalCatch.getCatch("userName");
     const currentRoomId = ref("");
-    let chatList = reactive(['11111']);
+    let chatList = reactive([]);
     ws = new webSocket("wss://lab.lapsap.moe/ws");
-    onBeforeMount(async () => {
-      console.log(chatList.value);
-      console.log("发生了挂在");
-    });
-    const a  = await infoFunction.queryMessage()
-    chatList.value = a
+    //删除房间
     const deleteRoom = (id) => {
       axios.delete(`/api/room/${id}`).then((res) => {
-        console.log(res.data);
         ElMessage.success("删除成功");
         emit("changeDeleteRoomList", res.data);
         location.reload();
       });
     };
+    //发送信息
     const sendMessage = () => {
       ws.send("pub", null, null, props.roomId.value.id, textarea.value);
       textarea.value = "";
     };
-    watch(props.roomId, () => {
+    //监听房间ID
+    watch(props.roomId, async () => {
+      // console.log(props.roomId.value);
       if (currentRoomId.value != "") {
-        ws.send("unsub", null, null, currentRoomId.value, "退出连接");
+        // ws.send("unsub", null, null, currentRoomId.value, "退出连接");
       }
       currentRoomId.value = props.roomId.value.id;
       ws.send("sub", null, null, props.roomId.value.id, "进入房间");
+      //Rx数据库操作
+      // console.log(props.roomId);
+      const Rx = await infoFunction.queryMessage(props.roomId.value.id);
+      //监听数据库个数
+      Rx.$.subscribe((results) => {
+        chatList.length = 0;
+        chatList.push(...results);
+      });
     });
     return { textarea, deleteRoom, sendMessage, chatList, userName };
   },
@@ -120,12 +146,10 @@ export default {
 }
 .chat-body {
   background-color: white;
-  height: 100%;
+  height: 87%;
 }
 .chat-item {
   display: flex;
-  align-items: flex-end;
-  height: 50px;
   margin: 5px;
   border-radius: 4px;
 }
@@ -158,7 +182,7 @@ export default {
 .sendMessage {
   width: 100%;
   /* padding: 10px; */
-  margin-top: 2px;
+  /* margin-top: 2px; */
   height: 200px;
   background: hsla(0, 0%, 100%, 0.3);
 }
@@ -170,5 +194,12 @@ export default {
   font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB",
     "Microsoft Yahei", tahoma, "WenQuanYi Micro Hei";
   font-size: 5px;
+}
+.util-box {
+  background-color: white;
+  display: flex;
+  align-items: center;
+  padding:0px 5px;
+
 }
 </style>
