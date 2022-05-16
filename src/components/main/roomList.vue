@@ -26,53 +26,52 @@
 </template>
 
 <script>
-import axios from "axios";
-import { ref } from "@vue/reactivity";
-import ycDialog from "../dialog/dialog.vue";
-import LocalCatch from "../../utils/catch";
+import axios from 'axios'
+import { ref } from '@vue/reactivity'
+import ycDialog from '../dialog/dialog.vue'
+import LocalCatch from '../../utils/catch'
 
 export default {
-  emits: ["changeRoom"],
+  emits: ['changeRoom'],
   components: {
-    ycDialog,
+    ycDialog
   },
   props: {
     deleteRoomLists: {
       type: Array,
-      default: [],
-    },
+      default: []
+    }
   },
   setup(props, { emit }) {
-    let roomList = ref([]);
-    let isHidden = ref(true);
-    let roomDialog = ref(false);
+    let roomList = ref([])
+    let isHidden = ref(true)
+    let roomDialog = ref(false)
 
-
-    axios.get("/api/room").then((res) => {
+    axios.get('/api/room').then((res) => {
       // console.log(res.data);
-      roomList.value = res.data;
-      isHidden.value = false;
-    });
+      roomList.value = res.data
+      isHidden.value = false
+    })
     const changeRoom = (item) => {
-      emit("changeRoom", item);
-    };
+      emit('changeRoom', item)
+    }
     const newRoom = () => {
-      roomDialog.value = !roomDialog.value;
-    };
+      roomDialog.value = !roomDialog.value
+    }
     const newRoomLists = (data) => {
-      roomList.value = data;
-      console.log(data);
-    };
+      roomList.value = data
+      console.log(data)
+    }
     return {
       changeRoom,
       roomList,
       isHidden,
       newRoom,
       roomDialog,
-      newRoomLists,
-    };
-  },
-};
+      newRoomLists
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -84,7 +83,7 @@ export default {
   height: 50px;
 }
 p {
-  font-family: "Times New Roman", Times, serif;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 .el-scrollbar {
@@ -96,7 +95,7 @@ p {
   box-shadow: 1px 1px 1px 1px #ccc;
   border-top: 2px solid #ccc;
   border-bottom: 2px solid #ccc;
-  font-family: "Times New Roman", Times, serif;
+  font-family: 'Times New Roman', Times, serif;
   color: rgba(47, 42, 42, 0.807);
   display: flex;
   align-items: center;

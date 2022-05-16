@@ -13,26 +13,23 @@ import {
   ElDialog,
   ElLoading,
   ElAvatar
-
 } from 'element-plus'
 const components = [
-    ElButton,
-    ElForm,
-    ElInput,
-    ElIcon,
-    ElContainer,
-    ElAside,
-    ElMain,
-    ElScrollbar,
-    ElFooter,
-    ElSkeleton,
-    ElDialog,
-    ElLoading,
-    ElAvatar
-    
+  ElButton,
+  ElForm,
+  ElInput,
+  ElIcon,
+  ElContainer,
+  ElAside,
+  ElMain,
+  ElScrollbar,
+  ElFooter,
+  ElSkeleton,
+  ElDialog,
+  ElLoading,
+  ElAvatar
 ]
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-
 
 export default function (app) {
   for (const component of components) {

@@ -21,7 +21,7 @@
             flexDirection: userName == item.name ? 'row-reverse' : 'row',
             alignItems: item.user === 'server' ? 'center' : 'flex-end',
             height: item.user === 'server' ? '25px' : '50px',
-            justifyContent: item.user === 'server' ? 'center' : '',
+            justifyContent: item.user === 'server' ? 'center' : ''
           }"
         >
           <template class="chatMessage" v-if="item.user === ''">
@@ -58,73 +58,73 @@
         </el-upload>
       </div>
       <el-input
-          v-model="textarea"
-          :rows="9"
-          type="textarea"
-          placeholder="Please input"
-          @keyup.enter="sendMessage"
-        />
+        v-model="textarea"
+        :rows="9"
+        type="textarea"
+        placeholder="Please input"
+        @keyup.enter="sendMessage"
+      />
     </div>
   </div>
 </template>
 
-<script >
-import { reactive, ref } from "@vue/reactivity";
-import { watch } from "@vue/runtime-core";
-import axios from "axios";
-import { ElMessage } from "element-plus";
-import webSocket from "../../utils/client";
-import LocalCatch from "../../utils/catch";
-import infoFunction from "../../utils/queryMessage";
+<script>
+import { reactive, ref } from '@vue/reactivity'
+import { watch } from '@vue/runtime-core'
+import axios from 'axios'
+import { ElMessage } from 'element-plus'
+import webSocket from '../../utils/client'
+import LocalCatch from '../../utils/catch'
+import infoFunction from '../../utils/queryMessage'
 export default {
   props: {
     roomId: {
       type: Object,
-      default: {},
-    },
+      default: {}
+    }
   },
-  emits: ["changeDeleteRoomList"],
+  emits: ['changeDeleteRoomList'],
   async setup(props, { emit }) {
     //初始化操作
-    let ws = null;
-    const textarea = ref("");
-    const userName = LocalCatch.getCatch("userName");
-    const currentRoomId = ref("");
-    let chatList = reactive([]);
-    ws = new webSocket("wss://lab.lapsap.moe/ws");
+    let ws = null
+    const textarea = ref('')
+    const userName = LocalCatch.getCatch('userName')
+    const currentRoomId = ref('')
+    let chatList = reactive([])
+    ws = new webSocket('wss://lab.lapsap.moe/ws')
     //删除房间
     const deleteRoom = (id) => {
       axios.delete(`/api/room/${id}`).then((res) => {
-        ElMessage.success("删除成功");
-        emit("changeDeleteRoomList", res.data);
-        location.reload();
-      });
-    };
+        ElMessage.success('删除成功')
+        emit('changeDeleteRoomList', res.data)
+        location.reload()
+      })
+    }
     //发送信息
     const sendMessage = () => {
-      ws.send("pub", null, null, props.roomId.value.id, textarea.value);
-      textarea.value = "";
-    };
+      ws.send('pub', null, null, props.roomId.value.id, textarea.value)
+      textarea.value = ''
+    }
     //监听房间ID
     watch(props.roomId, async () => {
       // console.log(props.roomId.value);
-      if (currentRoomId.value != "") {
+      if (currentRoomId.value != '') {
         // ws.send("unsub", null, null, currentRoomId.value, "退出连接");
       }
-      currentRoomId.value = props.roomId.value.id;
-      ws.send("sub", null, null, props.roomId.value.id, "进入房间");
+      currentRoomId.value = props.roomId.value.id
+      ws.send('sub', null, null, props.roomId.value.id, '进入房间')
       //Rx数据库操作
       // console.log(props.roomId);
-      const Rx = await infoFunction.queryMessage(props.roomId.value.id);
+      const Rx = await infoFunction.queryMessage(props.roomId.value.id)
       //监听数据库个数
       Rx.$.subscribe((results) => {
-        chatList.length = 0;
-        chatList.push(...results);
-      });
-    });
-    return { textarea, deleteRoom, sendMessage, chatList, userName };
-  },
-};
+        chatList.length = 0
+        chatList.push(...results)
+      })
+    })
+    return { textarea, deleteRoom, sendMessage, chatList, userName }
+  }
+}
 </script>
 
 <style scoped>
@@ -141,7 +141,7 @@ export default {
   align-items: center;
   height: 50px;
   border-bottom: 1px solid #ccc;
-  font-family: "Times New Roman", Times, serif;
+  font-family: 'Times New Roman', Times, serif;
   color: rgba(47, 42, 42, 0.807);
 }
 .chat-body {
@@ -164,8 +164,8 @@ export default {
 .user_name {
   font-size: 3px;
   color: #ccc;
-  font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB",
-    "Microsoft Yahei", tahoma, "WenQuanYi Micro Hei";
+  font-family: 'Helvetica Neue', Helvetica, 'Hiragino Sans GB',
+    'Microsoft Yahei', tahoma, 'WenQuanYi Micro Hei';
 }
 .user_message {
   margin: 3px 5px;
@@ -173,7 +173,7 @@ export default {
   background-color: greenyellow;
   border-radius: 4px;
   font-size: 15px;
-  font-family: "Times New Roman", Times, serif;
+  font-family: 'Times New Roman', Times, serif;
   color: rgba(47, 42, 42, 0.807);
   display: flex;
   align-items: center;
@@ -191,15 +191,14 @@ export default {
   align-items: center;
   justify-content: center;
   color: #ccc;
-  font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB",
-    "Microsoft Yahei", tahoma, "WenQuanYi Micro Hei";
+  font-family: 'Helvetica Neue', Helvetica, 'Hiragino Sans GB',
+    'Microsoft Yahei', tahoma, 'WenQuanYi Micro Hei';
   font-size: 5px;
 }
 .util-box {
   background-color: white;
   display: flex;
   align-items: center;
-  padding:0px 5px;
-
+  padding: 0px 5px;
 }
 </style>

@@ -1,5 +1,5 @@
-import LocalCatch from "../utils/catch";
-import DatabaseService from "../dbservices/index.js";
+import LocalCatch from '../utils/catch'
+import DatabaseService from '../dbservices/index.js'
 
 export default class webSocket {
   constructor(url) {
@@ -13,39 +13,38 @@ export default class webSocket {
   send(type, name, time, room, msg) {
     const obj = {
       type: type,
-      name: name || LocalCatch.getCatch("userName"),
+      name: name || LocalCatch.getCatch('userName'),
       time: time || new Date().getTime(),
       room: room || '',
-      msg: msg || '',
+      msg: msg || ''
     }
     // console.log(obj);
     const data = JSON.stringify(obj)
     if (this._connected) {
       this._ws.send(data)
-      console.log("信息发送成功");
+      console.log('信息发送成功')
     } else {
-      return "服务器出错"
+      return '服务器出错'
     }
   }
   async receive(message) {
     try {
-      let data = JSON.parse(JSON.parse(message.data.replace(/\"(.*?)\*/g,'')))
+      let data = JSON.parse(JSON.parse(message.data.replace(/\"(.*?)\*/g, '')))
       if (data.err) return
       //加入数据库
-      console.log(data);
-      data.id = (this.id+1).toString()
+      console.log(data)
+      data.id = (this.id + 1).toString()
       this.id++
       LocalCatch.setCatch('id', parseInt(data.id))
       await this.insertMessage(data)
-    } catch (e) {
-    }
+    } catch (e) {}
   }
   async insertMessage(message) {
     // console.log(message);
     // console.log(DatabaseService);
-    const db =await DatabaseService.get();
-    await db.chatinfo.insert(message);
-    console.log("插入成");
+    const db = await DatabaseService.get()
+    await db.chatinfo.insert(message)
+    console.log('插入成')
   }
   connect() {
     const ws = new WebSocket(this._url)
@@ -53,7 +52,7 @@ export default class webSocket {
     ws.onopen = () => {
       console.log('Connected to the server')
       this._connected = true
-      this.send('sub', null, null, null, "连接成功")
+      this.send('sub', null, null, null, '连接成功')
     }
     // listen a message from the server
     ws.onmessage = (message) => {

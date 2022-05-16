@@ -22,32 +22,32 @@
 </template>
 
 <script>
-import { reactive } from "@vue/reactivity";
-import chatPage from "./main/chatPage.vue";
-import roomList from "./main/roomList.vue";
+import { reactive } from '@vue/reactivity'
+import chatPage from './main/chatPage.vue'
+import roomList from './main/roomList.vue'
 export default {
   components: {
     chatPage,
-    roomList,
+    roomList
   },
   setup() {
-    const roomId = reactive({});
-    const deleteRoomLists = reactive([]);
+    const roomId = reactive({})
+    const deleteRoomLists = reactive([])
     const changeRoom = (room) => {
       // console.log(roomId);
-      roomId.value = room;
+      roomId.value = room
       // console.log(roomId.value);
-    };
+    }
     const changeDeleteRoomList = (room) => {
-      console.log(room);
-      deleteRoomLists.value = room;
-    };
-    return { changeRoom, roomId, changeDeleteRoomList, deleteRoomLists };
-  },
-};
+      console.log(room)
+      deleteRoomLists.value = room
+    }
+    return { changeRoom, roomId, changeDeleteRoomList, deleteRoomLists }
+  }
+}
 </script>
 
-<style >
+<style>
 #app {
   display: flex;
   justify-content: center;

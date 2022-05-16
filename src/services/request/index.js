@@ -1,6 +1,6 @@
-import { axios } from "axios";
+import { axios } from 'axios'
 class YcRequest {
-    constructor(config) {
-        this.instance = axios.create(config)
-    }
+  constructor(config) {
+    this.instance = axios.create(config)
+  }
 }

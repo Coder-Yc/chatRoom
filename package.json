@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite --mode development",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prettier": "prettier --write ."
   },
   "dependencies": {
     "fbemitter": "^3.0.0",
@@ -21,8 +22,16 @@
     "@element-plus/icons-vue": "^1.1.4",
     "@vitejs/plugin-vue": "^2.3.1",
     "axios": "^0.27.2",
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "^3.3.0",
     "element-plus": "^1.0.2-beta.63",
+    "prettier": "^2.6.2",
     "vite": "^2.9.7",
     "vue": "^3.2.33"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
