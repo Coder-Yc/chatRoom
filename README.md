@@ -1,4 +1,5 @@
 # Vue 3 + Vite
+后端接口：https://github.com/Coder-Yc/socket-chat-backend
 ## Project setup
 ```
 npm install
